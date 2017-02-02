@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  h1= title
+  p This is Sequelize greeting you :)
+
+  h2 Creating a new user
+  form(action="/users/create", method="post")
+    input(type="text", name="username")
+    input(type="submit")
+
+  h2 Users
+
+  ul
+  each user in users
+    li
+      = user.username
+      |  
+      | (
+      a(href="/users/" + user.id + "/destroy") Destroy
+      | )
