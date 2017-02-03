@@ -30,8 +30,8 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: "0"
-    },	
-	scope: {
+    },
+	  scope: {
       type: DataTypes.STRING,
       allowNull: true
     },
@@ -39,8 +39,8 @@ module.exports = function(sequelize, DataTypes) {
     tableName: 'mt_users',
     classMethods: {
       associate: function associate(models) {
-		models.mt_users.hasMany(models.mt_completion, {foreignKey: 'user_id'});
+		      models.mt_users.hasMany(models.mt_completion, {foreignKey: 'user_id'});
       },	  
-    },	
+    },
   });
 };

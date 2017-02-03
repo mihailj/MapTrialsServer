@@ -3,18 +3,18 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var authenticate = require('../oauth_authenticate')
-var sequelize = require('sequelize'); 
+var sequelize = require('sequelize');
 
 router.route('/:user_id')
 
 // update an user (accessed at PUT */users/:user_id)
 .put(authenticate({scope:'admin'}), function(req, res) {
-	var user = models.mt_users;	
-	
+	var user = models.mt_users;
+
 	user.update({ username: req.body.username, password: req.body.password }, { where: { id: req.params.user_id } })
 	.then (function(success) {
 		console.log(success);
-		if (success) {	
+		if (success) {
 			res.json({ message: 'User updated!' });
 		} else {
 		  res.send(401, "User not found");
@@ -36,7 +36,7 @@ router.route('/:user_id')
 	models.mt_users.findOne({ where: { id: req.params.user_id }, include: [ { model: models.mt_completion, required: false } ], attributes: { exclude: ['password'] } })
 	.then(function(users) {
 		console.log(users);
-		if (users) {				
+		if (users) {
 		  res.json(users);
 		} else {
 		  res.send(401, "User not found");
@@ -49,14 +49,14 @@ router.route('/:user_id')
 // delete an user by id (accessed at DELETE */users/:user_id)
 .delete(authenticate({scope:'admin'}), function(req, res) {
 	var user =  models.mt_users;
-	
+
 	user.destroy({
     where: {
         id: req.params.user_id
     }
 	})
 	.then(function(users) {
-		if (users) {				
+		if (users) {
 		  res.json({ message: 'User removed!' });
 		} else {
 		  res.send(401, "User not found");
@@ -64,7 +64,7 @@ router.route('/:user_id')
 	  }, function(error) {
 		res.send("User not found");
 	  });
-});	
+});
 
 router.post('/', authenticate({scope:'admin'}), function(req, res) {
 
@@ -72,17 +72,17 @@ router.post('/', authenticate({scope:'admin'}), function(req, res) {
 	  where: sequelize.where(sequelize.fn('lower', sequelize.col('username')), req.body.username.toLowerCase())
 	}).then(function(user) {
 	  if (user) {
-		  
+
 		// return HTTP status 422 = Unprocessable Entity
 		res.status(422).end();
-		
+
 	  } else {
 		if (req.body.type == 'admin') {
 		  scope = 'admin';
 		} else {
 		  scope = 'user';
 		}
-		
+
 		models.mt_users.create({
 			username: req.body.username,
 			password: req.body.password,
@@ -90,20 +90,35 @@ router.post('/', authenticate({scope:'admin'}), function(req, res) {
 			score: 0,
 			scope: scope
 		}).then(function(user) {
-			res.json(user);	
-		});	 		  
+			res.json(user);
+		});
 	  }
-	});        
+	});
 });
 
 /* GET users listing. */
 router.get('/', authenticate({scope:'admin'}), function(req, res, next) {
-	 models.mt_users.findAll({
-		 attributes: { exclude: ['password'] }
-	  }).then(function(users) {
+	models.mt_users.findAll({
+		 attributes: { exclude: ['password'] },
+		 include: [
+			 {
+				 model: models.mt_completion,
+				 include: [
+					 {
+						 model: models.mt_objectives,
+						 include: [
+							 {
+								 model: models.mt_locations
+							 }
+						 ]
+					 }
+				 ]
+			 }
+		 ]
+	}).then(function(users) {
 		res.json(users);
-	  });  
+	});
 });
 
-	
+
 module.exports = router;

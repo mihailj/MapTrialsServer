@@ -55,12 +55,12 @@ module.exports = function(sequelize, DataTypes) {
         models.mt_objectives.belongsTo(models.mt_locations, {
           foreignKey: 'location_id',
         });
-		
-		models.mt_objectives.hasMany(models.mt_completion, {foreignKey: 'objective_id'});
 
-		models.mt_objectives.belongsTo(models.mt_users, {foreignKey: 'user_id'});
-				
+		    models.mt_objectives.hasMany(models.mt_completion, {foreignKey: 'objective_id'});
+
+		    models.mt_objectives.belongsTo(models.mt_users, {foreignKey: 'user_id'});
+
       },
-    }, 	
+    },
   });
 };
