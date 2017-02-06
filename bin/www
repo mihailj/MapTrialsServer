@@ -7,7 +7,18 @@
 var app = require('../app');
 var debug = require('debug')('vagrant:server');
 var http = require('http');
+var https = require('https');
 var models = require('../models');
+
+var fs = require('fs');
+
+var hskey = fs.readFileSync('./maptrials-key.pem');
+var hscert = fs.readFileSync('./maptrials-cert.pem')
+
+var options = {
+    key: hskey,
+    cert: hscert
+};
 
 /**
  * Get port from environment and store in Express.
@@ -20,7 +31,9 @@ app.set('port', port);
 	 * Create HTTP server.
 	 */
 
-	var server = http.createServer(app);
+	//var server = http.createServer(app);
+
+var server = https.createServer(options, app); //.listen(8000);
 
 
 models.sequelize.sync().then(function() {
@@ -32,7 +45,7 @@ models.sequelize.sync().then(function() {
 	server.listen(port);
 	server.on('error', onError);
 	server.on('listening', onListening);
-	
+
 	console.log('server started');
 		  models.sequelize
 	  .authenticate()
