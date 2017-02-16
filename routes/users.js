@@ -4,6 +4,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var authenticate = require('../oauth_authenticate')
 var sequelize = require('sequelize');
+var bcrypt = require("bcryptjs");
 
 router.route('/:user_id')
 
@@ -11,7 +12,7 @@ router.route('/:user_id')
 .put(authenticate({scope:'admin'}), function(req, res) {
 	var user = models.mt_users;
 
-	user.update({ username: req.body.username, password: req.body.password }, { where: { id: req.params.user_id } })
+	user.update({ username: req.body.username, password: bcrypt.hashSync(req.body.password, 10) }, { where: { id: req.params.user_id } })
 	.then (function(success) {
 		console.log(success);
 		if (success) {
@@ -85,7 +86,7 @@ router.post('/', authenticate({scope:'admin'}), function(req, res) {
 
 		models.mt_users.create({
 			username: req.body.username,
-			password: req.body.password,
+			password: bcrypt.hashSync(req.body.password, 10),
 			type: req.body.type,
 			score: 0,
 			scope: scope

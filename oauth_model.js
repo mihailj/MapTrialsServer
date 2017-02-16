@@ -1,5 +1,5 @@
 var _ = require('lodash');
-
+var bcrypt = require("bcryptjs");
 var models  = require('./models');
 
 /*
@@ -34,7 +34,7 @@ function getAccessToken(bearerToken) {
     .catch(function (err) {
       console.log("getAccessToken - Err: ")
     });*/
-	
+
 	return models.oauth_access_tokens.find({
       where: {access_token: bearerToken},
       attributes: [['access_token', 'accessToken'], ['expires', 'accessTokenExpiresAt'],'scope'],
@@ -46,25 +46,25 @@ function getAccessToken(bearerToken) {
       ],
     })
 	.then(function(accessToken) {
-		
+
       if (!accessToken) return false;
 
 	  /*console.log('--- ACCESS TOKEN ---');
 	  console.log(accessToken);*/
-	  
+
       var token = accessToken.toJSON();
       token.user = token.mt_user;
       token.client = token.oauth_client;
       token.scope = token.scope
-	  
+
 	  /*console.log('--- TOKEN ---');
 	  console.log(token);*/
-	  
+
       return token;
-		
+
 	  }, function(error) {
 		console.log("getAccessToken - Err: ", error)
-	  });	
+	  });
 }
 
 function getClient(clientId, clientSecret) {
@@ -93,12 +93,12 @@ function getClient(clientId, clientSecret) {
     if (clientSecret != null) {
       params.client_secret = clientSecret;
     }
-  
+
 	return models.oauth_clients.find({ where: params })
 	.then(function(client) {
-		
+
       if (!client) return new Error("client not found");
-	
+
       var clientWithGrants = client.toJSON()
       clientWithGrants.grants = ['authorization_code', 'password', 'refresh_token', 'client_credentials']
       // Todo: need to create another table for redirect URIs
@@ -106,11 +106,11 @@ function getClient(clientId, clientSecret) {
       delete clientWithGrants.redirect_uri
       //clientWithGrants.refreshTokenLifetime = integer optional
       //clientWithGrants.accessTokenLifetime  = integer optional
-	  
+
 	  //console.log(clientWithGrants);
-	  
-      return clientWithGrants	
-		
+
+      return clientWithGrants
+
 	  }, function(error) {
 		console.log("getClient - Err: ", error)
 	  });
@@ -129,20 +129,20 @@ function getUser(username, password) {
     .catch(function (err) {
       console.log("getUser - Err: ", err)
     });*/
-	
+
 	return models.mt_users.find({ where: { username: username } })
 	.then(function(user) {
-		
-      if (!user) return new Error("user not found");
-	
-	  //console.log(user.toJSON());
-	
-	  return user.password == password ? user.toJSON() : false;
 
+      if (!user) return new Error("user not found");
+
+	  //console.log(user.toJSON());
+
+	  //return user.password == password ? user.toJSON() : false;
+			return bcrypt.compareSync(password, user.password) ? user.toJSON() : false;
 	  }, function(error) {
-		console.log("getUser - Err: ", error)
-	  });	
-	
+			console.log("getUser - Err: ", error)
+	  });
+
 }
 
 function revokeAuthorizationCode(code) {
@@ -320,10 +320,10 @@ function verifyScope(token, scope) {
 	/*console.log('--- VERIFY SCOPE ---');
 	console.log('token.scope: ' + token.scope);
 	console.log('scope: ' + scope);*/
-	
+
 	if (scope.indexOf(',') > -1) {
 		var scopes = scope.split(',');
-		
+
 		return (scopes.indexOf(token.scope) > -1)?true:false
 	} else {
 		return token.scope === scope
@@ -331,10 +331,10 @@ function verifyScope(token, scope) {
 }
 
 function validateScope(user, client, scope) {
-	
-	/*console.log('--- VALIDATE SCOPE ---');			
+
+	/*console.log('--- VALIDATE SCOPE ---');
 	console.log('scope: ' + scope);	*/
-	
+
   return (user.scope === scope && client.scope === scope && scope !== null)?scope:false
   //return true
 }
@@ -356,5 +356,5 @@ module.exports = {
   saveAuthorizationCode: saveAuthorizationCode, //renamed saveOAuthAuthorizationCode,
   validateScope: validateScope,
   verifyScope: verifyScope,
-  
+
 }
