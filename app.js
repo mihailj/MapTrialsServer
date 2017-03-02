@@ -16,6 +16,7 @@ var users = require('./routes/users');
 var locations = require('./routes/locations');
 var objectives = require('./routes/objectives');
 var completion = require('./routes/completion');
+var messages = require('./routes/messages');
 
 var app = express();
 
@@ -102,7 +103,7 @@ app.use('/users', users);
 app.use('/locations', locations);
 app.use('/objectives', objectives);
 app.use('/completion', completion);
-
+app.use('/messages', messages);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -49,6 +49,18 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
-    tableName: 'mt_objectives'
+    tableName: 'mt_objectives',
+    classMethods: {
+      associate: function associate(models) {
+        models.mt_objectives.belongsTo(models.mt_locations, {
+          foreignKey: 'location_id',
+        });
+
+		    models.mt_objectives.hasMany(models.mt_completion, {foreignKey: 'objective_id'});
+
+		    models.mt_objectives.belongsTo(models.mt_users, {foreignKey: 'user_id'});
+
+      },
+    },
   });
 };

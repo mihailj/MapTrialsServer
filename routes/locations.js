@@ -7,7 +7,7 @@ var authenticate = require('../oauth_authenticate')
 
 router.route('/:location_id')
 
-// update a user (accessed at PUT */locations/:location_id)
+// update a location (accessed at PUT */locations/:location_id)
 .put(authenticate({scope:'admin'}), function(req, res) {
 	var loc = models.mt_locations;
 
@@ -26,8 +26,6 @@ router.route('/:location_id')
 
 // get a location by id (accessed at GET */locations/:location_id)
 .get(authenticate({scope:'admin,user'}), function(req, res) {
-	//var user =  models.mt_locations;
-
 	models.mt_locations.findById(req.params.location_id)
 	.then(function(locations) {
 		console.log(locations);

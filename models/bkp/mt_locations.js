@@ -35,6 +35,13 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     }
   }, {
-    tableName: 'mt_locations'
+    tableName: 'mt_locations',
+    classMethods: {
+      associate: function associate(models) {
+		models.mt_locations.hasMany(models.mt_objectives, { foreignKey: 'location_id'} );
+		models.mt_locations.belongsTo(models.mt_users, { foreignKey: 'user_id'} );
+		
+      },
+    }, 	
   });
 };

@@ -41,6 +41,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.FLOAT,
       allowNull: true
     },
+    distance: {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    },	
     approved: {
       type: DataTypes.ENUM('y','n'),
       allowNull: false,
@@ -55,6 +59,16 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     }
   }, {
-    tableName: 'mt_completion'
+    tableName: 'mt_completion',
+    classMethods: {
+      associate: function associate(models) {
+        models.mt_completion.belongsTo(models.mt_objectives, {
+          foreignKey: 'objective_id',
+        });
+        models.mt_completion.belongsTo(models.mt_users, {
+          foreignKey: 'user_id',
+        });		
+      },
+    },
   });
 };

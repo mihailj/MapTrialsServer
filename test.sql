@@ -121,6 +121,25 @@ INSERT INTO `mt_users` VALUES (1,'admin','admin','admin',0,'admin',0),(2,'test',
 UNLOCK TABLES;
 
 --
+-- Table structure for table `mt_messages`
+--
+
+DROP TABLE IF EXISTS `mt_messages`;
+
+CREATE TABLE `mt_messages` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `type` enum('single','multiple','all') NOT NULL DEFAULT 'single',
+  `user_id` int(10) unsigned NOT NULL,
+  `subject` varchar(255) DEFAULT NULL,
+  `body` text,
+  `recipient_id` int(10) DEFAULT NULL,
+  `sent_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `reply_to` int(11) unsigned DEFAULT NULL,
+  `uid` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
 -- Table structure for table `oauth_access_tokens`
 --
 

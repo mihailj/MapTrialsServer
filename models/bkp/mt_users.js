@@ -25,8 +25,22 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: "0"
-    }
+    },
+    objectives_completed: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      defaultValue: "0"
+    },
+	  scope: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
   }, {
-    tableName: 'mt_users'
+    tableName: 'mt_users',
+    classMethods: {
+      associate: function associate(models) {
+		      models.mt_users.hasMany(models.mt_completion, {foreignKey: 'user_id'});
+      },	  
+    },
   });
 };
