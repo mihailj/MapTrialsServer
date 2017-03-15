@@ -100,8 +100,39 @@ upload(req,res,function(err) {
 
 app.get('/test-fcm', function(req, res, next) {
   /*res.render('index', { title: 'Nothing to see here, please move along.' });*/
-  var request = require('request');
 
+  var FCM = require('fcm-node');
+
+  var serverKey = app_config.firebase.auth_key;
+  var fcm = new FCM(serverKey);
+
+  var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+      to: app_config.firebase.device_id,
+      /*collapse_key: 'your_collapse_key',*/
+
+      /*notification: {
+          title: 'Title of your push notification',
+          body: 'Body of your push notification'
+      },*/
+
+      data: {  //you can send only notification or only data(or include both)
+          /*my_key: 'my value',
+          my_another_key: 'my another value'*/
+          message: "test from nodejs"
+      }
+  };
+
+  fcm.send(message, function(err, response){
+      if (err) {
+          console.log("Something has gone wrong!");
+      } else {
+          console.log("Successfully sent with response: ", response);
+      }
+  });
+
+  /*
+  var request = require('request');
+  console.error('aaaa');
   function sendMessageToUser(deviceId, message) {
     request({
       url: 'https://fcm.googleapis.com/fcm/send',
@@ -133,7 +164,7 @@ app.get('/test-fcm', function(req, res, next) {
     app_config.firebase.device_id,
     { message: 'Hello puf'}
   );
-}
+}*/
 });
 
 app.use('/uploads', express.static('uploads'));
