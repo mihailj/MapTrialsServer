@@ -1,3 +1,5 @@
+var app_config = require('./config/app_config');
+
 var express = require('express');
 var multer  =   require('multer');
 var path = require('path');
@@ -11,7 +13,7 @@ var Response = oauthServer.Response;
 
 var authenticate = require('./oauth_authenticate')
 
-//var index = require('./routes/index');
+var index = require('./routes/index');
 var users = require('./routes/users');
 var locations = require('./routes/locations');
 var objectives = require('./routes/objectives');
@@ -96,9 +98,47 @@ upload(req,res,function(err) {
 });
 });
 
+app.get('/test-fcm', function(req, res, next) {
+  /*res.render('index', { title: 'Nothing to see here, please move along.' });*/
+  var request = require('request');
+
+  function sendMessageToUser(deviceId, message) {
+    request({
+      url: 'https://fcm.googleapis.com/fcm/send',
+      method: 'POST',
+      headers: {
+        'Content-Type' :'application/json',
+        'Authorization': 'key=' + app_config.firebase.auth_key
+      },
+      body: JSON.stringify(
+        { "data": {
+          "message": message
+        },
+          "to" : deviceId
+        }
+      )
+    }, function(error, response, body) {
+      if (error) {
+        console.error(error, response, body);
+      }
+      else if (response.statusCode >= 400) {
+        console.error('HTTP Error: '+response.statusCode+' - '+response.statusMessage+'\n'+body);
+      }
+      else {
+        console.log('Done!')
+      }
+    });
+
+  sendMessageToUser(
+    app_config.firebase.device_id,
+    { message: 'Hello puf'}
+  );
+}
+});
+
 app.use('/uploads', express.static('uploads'));
 
-
+app.use('/', index);
 app.use('/users', users);
 app.use('/locations', locations);
 app.use('/objectives', objectives);

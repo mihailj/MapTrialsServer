@@ -52,3 +52,6 @@ uploads
 # Vagrant
 .vagrant
 Vagrantfile
+
+# app config
+config/app_config.js
