@@ -1,9 +1,16 @@
+var app_config = require('../config/app_config');
+
 var models  = require('../models');
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var authenticate = require('../oauth_authenticate')
 var uuid = require('node-uuid');
+
+// setup push notifications
+var FCM = require('fcm-node');
+var serverKey = app_config.firebase.auth_key;
+var fcm = new FCM(serverKey);
 
 router.route('/:message_id')
 
@@ -158,8 +165,46 @@ router.post('/', authenticate({scope:'admin,user'}), function(req, res) {
 		 });
 
 	 }).then(function(msg) {
-		  console.log(msg); // ... in order to get the array of user objects
-			res.json(msg);
+
+		 				// send push notifications
+						// TODO: send all in one go
+
+						models.mt_users.findAll({ where: { id: req.body.to }, attributes: { exclude: ['password'] } })
+						.then(function(users) {
+							console.log(users);
+							if (users) {
+
+								for (var i in users) {
+
+									if (users[i].device_id) {
+										var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+												to: users[i].device_id,
+												data: {
+														message: req.body.subject
+												}
+										};
+
+										fcm.send(message, function(err, response){
+												if (err) {
+														console.log("PUSH: Something has gone wrong!");
+												} else {
+														console.log("PUSH: Successfully sent with response: ", response);
+												}
+										});
+									}
+								}
+
+							  console.log(msg); // ... in order to get the array of user objects
+								res.json(msg);
+
+							  //res.json(users);
+							} else {
+							  //res.send(401, "User not found");
+							}
+						  }, function(error) {
+							//res.send("User not found");
+						  });
+
 		})
 
   } else {
@@ -194,9 +239,44 @@ router.post('/', authenticate({scope:'admin,user'}), function(req, res) {
 	 			}
 	 		],
 		 }).then(function(msg2){
-			res.json(msg2);
+
+			  // send push notification
+
+			 	models.mt_users.findOne({ where: { id: req.body.to[0] }, attributes: { exclude: ['password'] } })
+			 	.then(function(users) {
+			 		console.log(users);
+			 		if (users) {
+
+						if (users.device_id) {
+							var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+									to: users.device_id,
+									data: {
+											message: req.body.subject
+									}
+							};
+
+							fcm.send(message, function(err, response){
+									if (err) {
+											console.log("PUSH: Something has gone wrong!");
+											console.log(err);
+									} else {
+											console.log("PUSH: Successfully sent with response: ", response);
+									}
+							});
+						}
+
+		 					res.json(msg2);
+
+			 		  //res.json(users);
+			 		} else {
+			 		  //res.send(401, "User not found");
+			 		}
+			 	  }, function(error) {
+			 		//res.send("User not found");
+			 	  });
+			 })
+
 		 });
-		});
 
 	}
 

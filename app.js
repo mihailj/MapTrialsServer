@@ -130,41 +130,6 @@ app.get('/test-fcm', function(req, res, next) {
       }
   });
 
-  /*
-  var request = require('request');
-  console.error('aaaa');
-  function sendMessageToUser(deviceId, message) {
-    request({
-      url: 'https://fcm.googleapis.com/fcm/send',
-      method: 'POST',
-      headers: {
-        'Content-Type' :'application/json',
-        'Authorization': 'key=' + app_config.firebase.auth_key
-      },
-      body: JSON.stringify(
-        { "data": {
-          "message": message
-        },
-          "to" : deviceId
-        }
-      )
-    }, function(error, response, body) {
-      if (error) {
-        console.error(error, response, body);
-      }
-      else if (response.statusCode >= 400) {
-        console.error('HTTP Error: '+response.statusCode+' - '+response.statusMessage+'\n'+body);
-      }
-      else {
-        console.log('Done!')
-      }
-    });
-
-  sendMessageToUser(
-    app_config.firebase.device_id,
-    { message: 'Hello puf'}
-  );
-}*/
 });
 
 app.use('/uploads', express.static('uploads'));

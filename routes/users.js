@@ -97,6 +97,30 @@ router.post('/', authenticate({scope:'admin'}), function(req, res) {
 	});
 });
 
+router.post('/setdevice_id', authenticate({scope:'admin,user'}), function(req, res) {
+	if  (req.user.user.id != req.body.id) {
+		res.send("User not available");
+	}
+	else {
+		models.mt_users.update({ device_id: req.body.device_id }, { where: { id: req.body.id } })
+		.then (function(success) {
+			console.log('setdevice_id success: ');
+			console.log(success);
+			if (success) {
+				console.log('success evaluated true');
+				res.json({ success: true, message: 'User updated!' });
+			} else {
+				console.log('success evaluated false');
+				res.send(401, "User not found");
+			}
+		}, function(error) {
+			console.log('setdevice_id error:');
+			console.log(error);
+			res.send("User not found");
+		});
+	}
+});
+
 /* GET users listing. */
 router.get('/', authenticate({scope:'admin'}), function(req, res, next) {
 	models.mt_users.findAll({
