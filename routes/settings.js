@@ -44,7 +44,7 @@ router.post('/', authenticate({scope:'admin'}), function(req, res) {
 
 /* GET settings listing. */
 
-router.get('/', authenticate({scope:'admin'}), function(req, res, next) {
+router.get('/', authenticate({scope:'admin,user'}), function(req, res, next) {
 	 models.mt_settings.findAll({
 		//include: [ models.Task ]
   }).then(function(settings) {
