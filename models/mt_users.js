@@ -44,6 +44,7 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function associate(models) {
 		      models.mt_users.hasMany(models.mt_completion, {foreignKey: 'user_id'});
+          models.mt_users.hasMany(models.mt_tracking_sessions, {foreignKey: 'user_id'});
       },
     },
   });

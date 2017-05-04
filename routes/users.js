@@ -34,7 +34,13 @@ router.route('/:user_id')
 		}
 	}
 
-	models.mt_users.findOne({ where: { id: req.params.user_id }, include: [ { model: models.mt_completion, required: false } ], attributes: { exclude: ['password'] } })
+	models.mt_users.findOne({
+		where: { id: req.params.user_id },
+		include: [
+			{ model: models.mt_completion, required: false },
+			{ model: models.mt_tracking_sessions, required: false, order: 'date_start DESC', limit: 1 } 
+		],
+		attributes: { exclude: ['password'] } })
 	.then(function(users) {
 		console.log(users);
 		if (users) {
@@ -138,6 +144,13 @@ router.get('/', authenticate({scope:'admin'}), function(req, res, next) {
 						 ]
 					 }
 				 ]
+			 },
+			 /* load last tracking session */
+			 {
+				 model: models.mt_tracking_sessions,
+				 required: false,
+				 order: 'date_start DESC',
+				 limit: 1
 			 }
 		 ]
 	}).then(function(users) {

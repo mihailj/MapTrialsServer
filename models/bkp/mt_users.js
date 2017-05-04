@@ -35,12 +35,16 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: true
     },
+    device_id: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
   }, {
     tableName: 'mt_users',
     classMethods: {
       associate: function associate(models) {
 		      models.mt_users.hasMany(models.mt_completion, {foreignKey: 'user_id'});
-      },	  
+      },
     },
   });
 };
