@@ -10,7 +10,7 @@ router.post('/', authenticate({scope:'admin,user'}), function(req, res) {
   models.mt_tracking.create({
      latitude: req.body.latitude,
      longitude: req.body.longitude,
-     data: fecha.format(new Date(), 'YYYY-MM-DD hh:mm:ss'),
+     data: fecha.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
      session_id: req.body.session_id
   }).then(function(loc) {
     res.json(loc);

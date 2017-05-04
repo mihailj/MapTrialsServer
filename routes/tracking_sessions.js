@@ -12,7 +12,7 @@ router.route('/:session_id')
 
 	models.mt_tracking_sessions.update({
     admin_id_end: req.user.user.id,
-    date_end: fecha.format(new Date(), 'YYYY-MM-DD hh:mm:ss')
+    date_end: fecha.format(new Date(), 'YYYY-MM-DD HH:mm:ss')
   },
   {
     where: {
@@ -87,7 +87,7 @@ router.post('/', authenticate({scope:'admin'}), function(req, res) {
 
   models.mt_tracking_sessions.update({
     admin_id_end: req.user.user.id,
-    date_end: fecha.format(new Date(), 'YYYY-MM-DD hh:mm:ss')
+    date_end: fecha.format(new Date(), 'YYYY-MM-DD HH:mm:ss')
   },
   {
     where: {
@@ -100,7 +100,7 @@ router.post('/', authenticate({scope:'admin'}), function(req, res) {
 
       models.mt_tracking_sessions.create({
     	   admin_id_start: req.user.user.id,
-         date_start: fecha.format(new Date(), 'YYYY-MM-DD hh:mm:ss'),
+         date_start: fecha.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
          user_id: req.body.user_id
       }).then(function(sess) {
         res.json(sess);
