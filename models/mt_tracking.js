@@ -25,6 +25,13 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     }
   }, {
-    tableName: 'mt_tracking'
+    tableName: 'mt_tracking',
+    classMethods: {
+      associate: function associate(models) {
+
+		    models.mt_tracking.belongsTo(models.mt_tracking_sessions, {foreignKey: 'session_id'});
+
+      },
+    },
   });
 };

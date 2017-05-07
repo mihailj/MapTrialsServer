@@ -31,20 +31,28 @@ router.route('/:session_id')
 	});
 })
 
-// get a session by id (accessed at GET */tracking_sessions/:session_id)
-/*.get(authenticate({scope:'admin,user'}), function(req, res) {
-	models.mt_locations.findById(req.params.location_id)
-	.then(function(locations) {
-		console.log(locations);
-		if (locations) {
-		  res.json(locations);
+// get a session with tracking data by id (accessed at GET */tracking_sessions/:session_id)
+.get(authenticate({scope:'admin,user'}), function(req, res) {
+	models.mt_tracking_sessions.findOne({
+		where: { id: req.params.session_id },
+		include: [
+			{
+				model: models.mt_tracking,
+				required: false
+			}
+		]
+	})
+	.then(function(tracking_session) {
+		console.log(tracking_session);
+		if (tracking_session) {
+		  res.json(tracking_session);
 		} else {
-		  res.send(401, "Location not found");
+		  res.send(401, "Tracking session not found");
 		}
 	  }, function(error) {
-		res.send("Location not found");
+		res.send("Tracking session not found");
 	  });
-})*/
+})
 
 // delete a session by id (accessed at DELETE */tracking_sessions/:session_id)
 /*.delete(authenticate({scope:'admin'}), function(req, res) {

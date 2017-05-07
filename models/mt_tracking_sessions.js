@@ -29,6 +29,13 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     }
   }, {
-    tableName: 'mt_tracking_sessions'
+    tableName: 'mt_tracking_sessions',
+    classMethods: {
+      associate: function associate(models) {
+
+		    models.mt_tracking_sessions.hasMany(models.mt_tracking, {foreignKey: 'session_id'});
+
+      },
+    },
   });
 };
