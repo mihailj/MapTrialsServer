@@ -34,11 +34,19 @@ router.route('/:user_id')
 		}
 	}
 
+	console.log(req.query);
+	
+	if (req.query.tracking_sessions) {
+		var query_params = { model: models.mt_tracking_sessions, required: false, order: 'date_start DESC' };
+	} else {
+		var query_params = { model: models.mt_tracking_sessions, required: false, order: 'date_start DESC', limit: 1 };
+	}
+
 	models.mt_users.findOne({
 		where: { id: req.params.user_id },
 		include: [
 			{ model: models.mt_completion, required: false },
-			{ model: models.mt_tracking_sessions, required: false, order: 'date_start DESC', limit: 1 } 
+			query_params
 		],
 		attributes: { exclude: ['password'] } })
 	.then(function(users) {
