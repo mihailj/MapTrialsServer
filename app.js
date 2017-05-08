@@ -11,6 +11,8 @@ var oauthServer = require('oauth2-server');
 var Request = oauthServer.Request;
 var Response = oauthServer.Response;
 
+var ws = require('nodejs-websocket');
+
 var authenticate = require('./oauth_authenticate')
 
 var index = require('./routes/index');
@@ -22,6 +24,49 @@ var messages = require('./routes/messages');
 var settings = require('./routes/settings');
 var tracking = require('./routes/tracking');
 var tracking_sessions = require('./routes/tracking_sessions');
+
+var rttServer = ws.createServer(function (conn) {
+	console.log('New real time tracking connection established.', new Date().toLocaleTimeString());
+	conn.on('text', function (msg) {
+		// simple object transformation (= add current time)
+		var msgObj = JSON.parse(msg);
+		msgObj.newDate = new Date().toLocaleTimeString();
+		var newMsg = JSON.stringify(msgObj);
+
+		// echo message including the new field to all connected clients
+		rttServer.connections.forEach(function (conn) {
+			conn.sendText(newMsg);
+		});
+	});
+	conn.on('close', function (code, reason) {
+		console.log('Real time tracking connection closed.', new Date().toLocaleTimeString(), 'code: ', code);
+	});
+
+	conn.on('error', function (err) {
+		// only throw if something else happens than Connection Reset
+		if (err.code !== 'ECONNRESET') {
+			console.log('Error in real time tracking Socket connection', err);
+			throw  err;
+		}
+	})
+}).listen(3005, function () {
+	console.log('Real time tracking socketserver running on localhost:3005');
+});
+
+/*setInterval(function () {
+	// Only emit numbers if there are active connections
+	if (rttServer.connections.length > 0) {
+	  //var randomNumber = (Math.floor(Math.random() * 10000) + 1).toString();
+		//console.log(randomNumber);
+		rttServer.connections.forEach((function (conn) {
+			//conn.send(randomNumber)
+      var str = JSON.stringify({ user_id: 2, latitude: 42.0121 + Math.random(), longitude: 20.1231 + Math.random() });
+      console.log('random location data:');
+      console.log(str);
+      conn.send(str);
+		}));
+	}
+}, 1000);*/
 
 var app = express();
 
@@ -101,8 +146,7 @@ upload(req,res,function(err) {
 });
 });
 
-app.get('/test-fcm', function(req, res, next) {
-  /*res.render('index', { title: 'Nothing to see here, please move along.' });*/
+/*app.get('/test-fcm', function(req, res, next) {
 
   var FCM = require('fcm-node');
 
@@ -111,16 +155,8 @@ app.get('/test-fcm', function(req, res, next) {
 
   var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
       to: app_config.firebase.device_id,
-      /*collapse_key: 'your_collapse_key',*/
-
-      /*notification: {
-          title: 'Title of your push notification',
-          body: 'Body of your push notification'
-      },*/
 
       data: {  //you can send only notification or only data(or include both)
-          /*my_key: 'my value',
-          my_another_key: 'my another value'*/
           message: "test from nodejs"
       }
   };
@@ -133,7 +169,7 @@ app.get('/test-fcm', function(req, res, next) {
       }
   });
 
-});
+});*/
 
 app.use('/uploads', express.static('uploads'));
 
