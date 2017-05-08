@@ -22,7 +22,28 @@ router.route('/:session_id')
 	.then (function(success) {
 		console.log(success);
 		if (success) {
-			res.json({ message: 'Tracking session updated!' });
+
+			models.mt_tracking_sessions.findOne({
+				where: { id: req.params.session_id },
+				include: [
+					{
+						model: models.mt_tracking,
+						required: false
+					}
+				]
+			})
+			.then(function(tracking_session) {
+				console.log(tracking_session);
+				if (tracking_session) {
+				  res.json(tracking_session);
+				} else {
+				  res.send(401, "Tracking session not found");
+				}
+			  }, function(error) {
+				res.send("Tracking session not found");
+			  });
+
+			//res.json({ message: 'Tracking session updated!' });
 		} else {
 		  res.send(401, "Tracking session not found");
 		}
@@ -55,16 +76,20 @@ router.route('/:session_id')
 })
 
 // delete a session by id (accessed at DELETE */tracking_sessions/:session_id)
-/*.delete(authenticate({scope:'admin'}), function(req, res) {
-	var loc =  models.mt_locations;
+.delete(authenticate({scope:'admin'}), function(req, res) {
+	//var loc =  models.mt_locations;
 
-	loc.destroy({
-		where: { id: req.params.location_id }
-	}).then(function(locations) {
-		if (locations) {
-
+	models.mt_tracking_sessions.destroy({
+		where: { id: req.params.session_id }
+	}).then(function(tracking_sessions) {
+		if (tracking_sessions) {
+			models.mt_tracking.destroy({
+				where: { session_id: req.params.session_id }
+			}).then(function(compl) {
+				res.json({ message: 'Tracking session removed!' });
+			});
 		  // delete associated objectives
-		  models.mt_objectives.findAll({
+		  /*models.mt_objectives.findAll({
 			where: { location_id: req.params.location_id }
 		  }).then(function(objectives) {
 			  for (var i in objectives) {
@@ -80,16 +105,15 @@ router.route('/:session_id')
 
 				});
 			  }
-		  });
+		  });*/
 
-		  res.json({ message: 'Location removed!' });
 		} else {
-		  res.send(401, "Location not found");
+		  res.send(401, "Tracking session not found");
 		}
 	  }, function(error) {
-		res.send("Location not found");
+			res.send("Tracking session not found");
 	  });
-});*/
+});
 
 router.post('/', authenticate({scope:'admin'}), function(req, res) {
 
