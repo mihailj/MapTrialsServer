@@ -1,5 +1,6 @@
 var app_config = require('./config/app_config');
 
+var fecha = require('fecha');
 var express = require('express');
 var multer  =   require('multer');
 var path = require('path');
@@ -26,7 +27,7 @@ var tracking = require('./routes/tracking');
 var tracking_sessions = require('./routes/tracking_sessions');
 
 var rttServer = ws.createServer(function (conn) {
-	console.log('New real time tracking connection established.', new Date().toLocaleTimeString());
+	console.log('New real time tracking connection established.', fecha.format(new Date(), 'YYYY-MM-DD HH:mm:ss'));
 	conn.on('text', function (msg) {
 		// simple object transformation (= add current time)
 		var msgObj = JSON.parse(msg);
@@ -39,7 +40,7 @@ var rttServer = ws.createServer(function (conn) {
 		});
 	});
 	conn.on('close', function (code, reason) {
-		console.log('Real time tracking connection closed.', new Date().toLocaleTimeString(), 'code: ', code);
+		console.log('Real time tracking connection closed.', fecha.format(new Date(), 'YYYY-MM-DD HH:mm:ss'), 'code: ', code);
 	});
 
 	conn.on('error', function (err) {
